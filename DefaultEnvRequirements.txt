@@ -1,0 +1,30 @@
+#Create Conda Env
+conda create -n (name) python=3.9
+
+#Activate Env
+conda activate (name)
+
+#install kernel
+pip install ipykernel
+python -m ipykernel install --user --name (name) --display-name "(name)"
+
+#Env Installs
+
+#Flight Radar API
+pip install FlightRadarAPI
+
+#Twitter API
+pip install twython
+
+#Cartopy API
+conda install -c conda-forge cartopy
+
+#Matplotlib
+pip install matplotlib
+
+#Lookup Coordinates Location
+pip install geopy
+pip install reverse-geocode
+
+#Save Data
+pip install pickle-mixin
