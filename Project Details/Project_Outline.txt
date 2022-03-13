@@ -1,0 +1,17 @@
+Kyle R Fogerty
+Outline:
+
+>BotCommander           #Runs All the bots and keeps track of timing
+
+>Database               #Saved constant data to get more information
+->FlightBots_Data       #Flight bots constant data
+
+>FlightBots             #All Flight Bots
+
+>Project Details        #Overview of Data and Requirements
+->Project_Outline       #Outline of projects items
+
+>Saved Data             #Saved data from program running
+
+>TwitterAuths           #Login Keys for Twitter Accounts
+->FlightBots_Auth       #Folder of Flight Bots Logins
