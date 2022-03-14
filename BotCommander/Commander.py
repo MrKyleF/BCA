@@ -11,8 +11,12 @@ class BotCommander:
         print("")
         print("*** Initializing The General ***")
         print(" ")
-        self.flight_commander = FlightCommander()
+        lat = float(input("Enter Latitude: "))
+        lon = float(input("Enter Longitude: "))
+        distance = float(input("Enter Distance: (km) "))
+        self.flight_commander = FlightCommander(location=[lat, lon], distance=distance)
         print("*** The General Initialized ***")
+
 
     def step(self):
         self.flight_commander.step()

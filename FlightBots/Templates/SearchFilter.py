@@ -1,6 +1,7 @@
 #Kyle R Fogerty
 import csv
 from enum import Enum
+import geopy
 
 class SearchType(Enum):
     military = 0
@@ -9,25 +10,23 @@ class SearchType(Enum):
     celebrity = 3
 
 class SearchFilter:
+    def checkDistance(self, coords_1, flightlog, distance):
+        return True if geopy.distance.vincenty(coords_1, flightlog.coordinates).km < distance else False
+
     #Check Single Flight Log For Military Attributes
-    def checkSingleMilitaryFlightLog(self, flight_log):
+    def checkSingleMilitaryFlightLog(self, flight_log, main_coords, distance):
         if flight_log.comments != None and flight_log.airline_name != None and flight_log.lastLogLengthVsNow() == True:             #Check For none fields
             lowercase_comments = flight_log.comments.lower()
             lowercase_airline_name = flight_log.airline_name.lower()
             keywords = ["force", "army","navy","unit ","squadron","special","military"]     #Keywords used to located miltary aircraft
-            for keyword in range(0, len(keywords)):
-                if keywords[keyword] in lowercase_comments or keywords[keyword] in lowercase_airline_name:
-                    flight_log.setMilitaryInfo()
-                    return flight_log                                                       #Returns with true
+            if self.checkDistance(main_coords, flight_log, distance) == True:
+                for keyword in range(0, len(keywords)):
+                    if keywords[keyword] in lowercase_comments or keywords[keyword] in lowercase_airline_name:
+                        flight_log.setMilitaryInfo()
+                        return flight_log                                                       #Returns with true
         return flight_log                                                                    
     
-    #Check Single Flight Log for Blocked Attributes
-    def checkSingleFlightLogBlocked(self, flight_log):
-        if flight_log.lastLogLengthVsNow() == True: #Check if updated
-            if "blocked" in flight_log.flight.aircraft_code.lower() or "blocked" in flight_log.flight.callsign.lower():
-                flight_log.setBlockedInfo()
-                return flight_log                                                   #Returns True, in filter
-        return flight_log                                                        #Returns False, not in filter    
+
 
     
     def checkSingleFlightLogBillionaire(self, flight_log):
@@ -55,11 +54,11 @@ class SearchFilter:
             csvfile.close()
         return flight_log                                                  #Returns False, not in filter
 
-    def checkAllFlightLogs(self, flight_logs):
+    def checkAllFlightLogs(self, flight_logs, main_coords, distance):
         keywords_found = []                                     #Flight Logs Containing Keywords
         for flight in flight_logs:                              
             if self.searchType == SearchType.military:
-                new_log = self.checkSingleMilitaryFlightLog(flight)
+                new_log = self.checkSingleMilitaryFlightLog(flight, main_coords, distance)
                 if new_log.military_jet == True:
                     keywords_found.append(new_log)  
             elif self.searchType == SearchType.blocked:
@@ -77,8 +76,8 @@ class SearchFilter:
         
         return keywords_found                                   #Return List of Flights Containing Keywords
     
-    def searchWithFilters(self, logs):
-        self.filtered_flights = self.checkAllFlightLogs(logs)
+    def searchWithFilters(self, logs, main_coords, distance):
+        self.filtered_flights = self.checkAllFlightLogs(logs, main_coords, distance)
         return False if len(self.filtered_flights) == 0 else True
     
     def setTiming(self, offset, sleep_timer):

@@ -7,23 +7,22 @@ from FlightBots.Templates.SearchFilter import SearchFilter, SearchType
 
 
 class FlightCommander:
-    def loadFlightData(self, resetData):
-        if resetData == True:
-            self.flightData = forceResetFlightData()
-        else:
-            self.flightData = checkIfFlightDataExists()
+    def loadFlightData(self):
+        self.flightData = forceResetFlightData()
     
-    def createFilters(self, exclude=[]):
+    def createFilters(self, exclude=[1,2,3]):
         self.filters = []
         for i in range(0, len(SearchType)):
             if i not in exclude:
                 self.filters.append(SearchFilter(filter_type=i, offset=i))
 
-    def __init__(self, resetData=False, exclude_filters=[]):
+    def __init__(self, location, distance, resetData=False, exclude_filters=[]):
         self.current_index = 0
+        self.location = location
+        self.distance = distance
         #print("      *   Flight Data Object Not Found: Creating...   *") ref size
         print("   **     Initalizing Flight Commander                **")
-        self.loadFlightData(resetData=resetData)
+        self.loadFlightData()
         print("      *   Intitalizing Flight Filters                 *")
         self.createFilters(exclude=exclude_filters)
         print("      *   Flight Filters Initialized                  *")
@@ -42,19 +41,13 @@ class FlightCommander:
         for i in range(0, len(self.filters)):
             if self.filters[i].next_index == self.current_index:
                 #Search with filter
-                if self.filters[i].searchWithFilters(self.flightData.getActivateFlights()) == True:
+                if self.filters[i].searchWithFilters(self.flightData.getActivateFlights(), self.location, self.distance) == True:
                     #Tweet Data
-                    tweeted, response = tweetFlightData(self.filters[i].filtered_flights, self.filters[i].searchType)
-                    #Print responses
-                    print(self.filters[i].searchType.name.capitalize(), "Responses:")
-                    for r in range(0, len(response)):
-                        print(str(response[r][1]) + "x " + response[r][0])
-                    #Move to Next Step
+                    tweetFlightData(self.filters[i].filtered_flights, self.filters[i].searchType)
                     self.filters[i].moveToNextStep()
                 else:
                     self.filters[i].tryNextLoop()
         #Save Current Flight Data
-        saveFlightData(self.flightData)
         #Move To Next Index
         self.current_index += 1
         #Stop Overflow digits

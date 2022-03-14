@@ -78,7 +78,7 @@ def forceResetFlightData():
     print("      *   Force Reseting Flight Data                  *")
     obj_path = 'SavedData/FlightData/flightData.pkl'
     obj = FlightData()
-    return saveFlightData(obj)
+    return (obj)
 
 #obj = checkIfFlightDataExists()
 #print(obj)
